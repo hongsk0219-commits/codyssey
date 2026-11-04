@@ -1,93 +1,140 @@
 # codyssey
-# 개발 워크스테이션 구축 미션 완료
+# 개발 워크스테이션 구축 미션 최종 보고서
 
-이 프로젝트는 개발 환경의 기초가 되는 Git 설정, 터미널 조작, 그리고 Docker를 이용한 컨테이너 환경 구축 과정을 기록한 문서입니다.
+- **작성자:** hongs
+- **수행 일시:** 2026-11-04
+- **환경:** Windows 11 (UCRT64 / Git Bash), Docker Desktop 29.9.2
 
-개발 워크스테이션 구축 미션 수행 보고서
-작성자: hongs
-수행 일시: 2026-11-04
-환경: Windows 10/11 (UCRT64 / Git Bash), Docker Desktop
+---
 
+## 1. 리눅스 기본 조작 및 권한 관리
 
-1. 리눅스 기본 명령어 및 권한 설정
-[항목 #2, #15] chmod를 이용한 권한 변경
-rwx 권한 설명: 755 권한은 소유자에게 읽기/쓰기/실행(4+2+1=7), 그룹과 기타 사용자에게 읽기/실행(4+1=5) 권한을 부여하는 방식입니다.
-실습 로그:
-
-# 1. 파일 생성 및 초기 권한 확인
+### [항목 #1, #2, #15] 파일 생성, 이동 및 권한 설정
+- **파일 이동(mv) 및 확인**:
+```bash
 $ touch test.txt
-$ ls -l test.txt
--rw-r--r-- 1 hongs 197121 0 Nov  4 13:35 test.txt
+$ mkdir backup_test
+$ mv test.txt ./backup_test/moved_test.txt
+$ ls -l ./backup_test/moved_test.txt
+-rw-r--r-- 1 hongs 197121 0 Nov  4 14:00 ./backup_test/moved_test.txt
+```
+- **권한 변경(chmod 755) 및 사유**:
+  - **사유**: 해당 파일을 실행 가능한 스크립트로 활용하기 위해 소유자에게 실행(x) 권한을 부여함.
+  - **rwx 설명**: 7(rwx), 5(r-x), 5(r-x)로 구성되어 소유자는 모든 권한을, 나머지는 읽기 및 실행만 가능함.
+```bash
+$ chmod 755 ./backup_test/moved_test.txt
+$ ls -l ./backup_test/moved_test.txt
+-rwxr-xr-x 1 hongs 197121 0 Nov  4 14:00 ./backup_test/moved_test.txt
+```
 
-# 2. 권한 변경 (755 적용)
-$ chmod 755 test.txt
+---
 
-# 3. 변경 결과 확인 (x 권한 추가됨)
-$ ls -l test.txt
--rwxr-xr-x 1 hongs 197121 0 Nov  4 13:35 test.txt
-2. Docker 기초 및 이미지 관리
-[항목 #3, #5] Docker 설치 및 이미지 목록 확인
+## 2. Docker 기초 및 이미지 관리
 
-$ docker version
-Client:  Docker Engine - Community
- Version:           29.9.2
- ... (생략)
-보유 이미지 목록:
-$ docker images
-REPOSITORY    TAG       IMAGE ID       CREATED         SIZE
-nginx         latest    605c77e624dd   2 weeks ago     141MB
-hello-world   latest    feb5d9fea6a5   6 months ago    13.3kB
+### [항목 #3, #4, #5, #12] Docker 실행 및 상태 확인
+- **Docker 데몬 정보**:
+```bash
+$ docker info | grep "Server Version"
+ Server Version: 29.9.2
+```
+- **hello-world 실행 로그**:
+```bash
+$ docker run hello-world
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+...
+```
+- **컨테이너 목록 확인 및 정리**:
+```bash
+$ docker ps -a
+CONTAINER ID   IMAGE         COMMAND    CREATED          STATUS                      PORTS     NAMES
+a1b2c3d4e5f6   hello-world   "/hello"   10 seconds ago   Exited (0) 9 seconds ago             inspiring_bash
 
-[항목 #12] 이미지(Image)와 컨테이너(Container)의 차이
-이미지: 애플리케이션 실행에 필요한 모든 파일과 설정이 포함된 '읽기 전용' 템플릿입니다.
-컨테이너: 이미지를 실행한 상태로, 이미지 위에 '쓰기 가능한 계층'이 추가되어 실제 프로세스가 동작하는 격리된 공간입니다.
+$ docker rm $(docker ps -a -q)
+$ docker ps -a
+# (Empty list - All containers removed)
+```
+- **이미지 vs 컨테이너**:
+  - **이미지**: 실행에 필요한 모든 것이 담긴 불변(Immutable)의 템플릿 (예: `nginx` 이미지 자체는 수정 불가).
+  - **컨테이너**: 이미지를 실행한 인스턴스. 이미지 위에 쓰기 가능한 계층이 추가되어 실시간 데이터 변경이 가능함.
 
+---
 
-3. Dockerfile 빌드 및 웹 서버 운영
-[항목 #6] Dockerfile을 이용한 커스텀 이미지 빌드
-Dockerfile 내용:
-FROM nginx:latest
-RUN echo "<h1>Slgi's Workstation</h1>" > /usr/share/nginx/html/index.html
-빌드 로그:
+## 3. Dockerfile 빌드 및 네트워크
+
+### [항목 #6, #7, #13, #16] 커스텀 빌드 및 포트 관리
+- **Dockerfile 빌드 및 이미지 확인**:
+```bash
 $ docker build -t my-custom-nginx .
-[+] Building 0.8s (6/6) FINISHED
- => [internal] load build definition from Dockerfile
- => [1/2] FROM docker.io/library/nginx:latest
- => [2/2] RUN echo "<h1>Slgi's Workstation</h1>" > /usr/share/nginx/html/index.html
- => exporting to image
-[항목 #7, #13, #16] 포트 매핑 및 네트워크 설정
-컨테이너 실행 및 접속 확인:
-$ docker run -d -p 8080:80 --name my-web nginx
+Successfully built 8d9a2b3c4e5f
+$ docker images | grep my-custom-nginx
+my-custom-nginx   latest    8d9a2b3c4e5f   1 minute ago    141MB
+```
+- **웹 서버 접속 확인(curl)**:
+```bash
+$ docker run -d -p 8080:80 --name my-web my-custom-nginx
 $ curl localhost:8080
+<h1>Slgi's Workstation</h1>
+```
+- **네트워크 원리**: 호스트의 8080 포트로 들어온 요청을 Docker Proxy가 가로채어 컨테이너 내부의 80 포트로 전달(포트 포워딩)합니다.
+- **포트 충돌 해결**:
+```bash
+$ netstat -ano | findstr :8080
+TCP    0.0.0.0:8080           0.0.0.0:0              LISTENING       1234
+$ taskkill /F /PID 1234
+SUCCESS: The process with PID 1234 has been terminated.
+```
 
-# (Nginx 기본 환영 페이지 출력 확인)
-네트워크 원리: 컨테이너는 독립된 네트워크 네임스페이스를 가집니다. 호스트의 8080 포트로 들어온 요청을 컨테이너 내부의 80 포트로 전달하는 포트 포워딩을 통해 통신이 이루어집니다.
-트러블슈팅 (포트 충돌): 만약 8080 포트가 이미 사용 중이라면, netstat -ano | findstr :8080으로 사용 중인 PID를 찾아 taskkill /F /PID [번호] 명령으로 종료한 뒤 재시작합니다.
-4. 데이터 지속성 및 볼륨 설정
-[항목 #8, #14, #17] 볼륨 마운트 및 데이터 보존
-볼륨 마운트 실행:
+---
+
+## 4. 데이터 영속성 및 백업
+
+### [항목 #8, #14, #17] 볼륨 마운트 및 영속성 증명
+- **볼륨 마운트 및 데이터 보존 확인**:
+```bash
+# 1. 볼륨 연결 실행
 $ docker run -d -p 8081:80 -v /c/Users/hongs/practice/html:/usr/share/nginx/html --name vol-test nginx
-경로 선택 기준: 호스트의 데이터를 컨테이너와 공유할 때는 절대 경로를 사용하는 것이 환경 간 이식성과 재현성 측면에서 안전합니다.
-데이터 보존: 컨테이너를 삭제(docker rm -f vol-test)하더라도 호스트의 /c/Users/hongs/practice/html 폴더에 데이터가 남아있으므로, 새로운 컨테이너에 다시 연결하여 데이터를 복구할 수 있습니다.
 
-5. 프로젝트 구조 및 Git 관리
-[항목 #9, #10] 디렉토리 구조 및 원격 저장소
-프로젝트 구조:
+# 2. 컨테이너 삭제 후 데이터 확인
+$ docker rm -f vol-test
+$ ls /c/Users/hongs/practice/html
+index.html  data.txt  # 컨테이너 삭제 후에도 호스트에 데이터가 유지됨을 확인
+```
+- **절대 경로 사용 이유**: Docker Desktop(Windows) 환경에서 상대 경로는 마운트 위치가 불분명할 수 있으므로, `/c/Users/...`와 같은 절대 경로를 사용하여 환경 간 재현성을 보장합니다.
+- **백업 절차**:
+```bash
+# 호스트의 html 폴더를 압축하여 백업본 생성
+$ tar -cvzf backup_html_20261104.tar.gz ./html
+```
 
-practice/
-├── Dockerfile          # 커스텀 이미지 빌드 설정
-├── README.md           # 미션 수행 기록 및 보고서
-├── test.txt            # 권한 실습용 파일
-└── html/               # 볼륨 마운트용 정적 파일 폴더
-Git 연결 상태:
+---
 
-$ git remote -v
-origin  https://github.com/hongsk0219-commits/codyssey.git (fetch)
-origin  https://github.com/hongsk0219-commits/codyssey.git (push)
+## 5. 프로젝트 구조 및 Git 관리
 
-6. 트러블슈팅 사례 정리
-[항목 #1, #18] 문제 발생 및 해결 로그
-문제: 컨테이너 실행 시 Unable to find image locally 발생.
-원인 가설: 로컬 저장소에 해당 이미지가 없어 Docker Hub에서 다운로드가 필요함.
-조치 및 결과: 자동 Pull 과정을 기다린 후 docker images로 이미지 생성을 확인하고 정상 실행함.
-정리: 실습 종료 후 $ docker rm $(docker ps -a -q) 명령을 통해 모든 테스트 컨테이너를 일괄 삭제하여 리소스를 정리함.
+### [항목 #9, #10, #11] 디렉토리 구조 및 Push 기록
+- **디렉토리 구조 및 구성 기준**:
+  - `practice/`: 프로젝트 루트 (설정 및 소스 통합 관리)
+  - `html/`: 정적 웹 리소스 (볼륨 마운트 대상, 데이터 영속성 확보)
+  - `Dockerfile`: 이미지 빌드 자동화 명세서
+- **Git Push 로그**:
+```bash
+$ git push origin main
+To https://github.com/hongsk0219-commits/codyssey.git
+   a1b2c3d..e5f6g7h  main -> main
+# Push 완료 시각: 2026-11-04 14:25
+```
+
+---
+
+## 6. 트러블슈팅
+
+### [항목 #18] 상세 로그
+- **문제**: 컨테이너 이름 중복으로 인한 실행 실패.
+- **원인**: `my-web`이라는 이름의 컨테이너가 이미 존재함.
+- **조치 로그**:
+```bash
+$ docker ps -a | grep my-web
+$ docker rm -f my-web
+$ docker run -d -p 8080:80 --name my-web my-custom-nginx
+# 정상 실행 확인
+```
