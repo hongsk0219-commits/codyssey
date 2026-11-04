@@ -3,154 +3,91 @@
 
 이 프로젝트는 개발 환경의 기초가 되는 Git 설정, 터미널 조작, 그리고 Docker를 이용한 컨테이너 환경 구축 과정을 기록한 문서입니다.
 
-## 1. 실행 환경 (Environment)
-- **OS**: Windows 10/11 (WSL2 사용)
-- **Terminal**: Git Bash / UCRT64
-- **Docker Version**: 29.9.2 (최신 버전)
-
-## 2. 미션 체크리스트 (Checklist)
-- [x] Git 사용자 정보 설정 및 기본 브랜치(main) 변경
-- [x] GitHub 원격 저장소 생성 및 로컬 연동
-- [x] Docker Desktop 설치 및 WSL2 연동 확인
-- [x] `hello-world` 컨테이너 실행 성공
-- [x] `ubuntu` 컨테이너 진입 및 리눅스 기본 명령어 실습
-- [x] `nginx` 웹 서버 포트 매핑(8080:80) 및 브라우저 접속 성공
-
-## 3. 주요 수행 로그 (Execution Log)
-
-### ✅ Docker 컨테이너 실행 및 정리
-```bash
-# Ubuntu 컨테이너 실행 및 내부 탐색
-$ docker run -it ubuntu bash
-root@18f5b654bd25:/# ls
-root@18f5b654bd25:/# whoami
-root
-
-# 사용 완료한 컨테이너 일괄 삭제
-$ docker rm $(docker ps -a -q)
-
-#Nginx 웹서버 구동
-
-## docker check
-hongs@LAPTOP-BAB5FBTD UCRT64 ~
-$ docker --version
-Docker version 29.9.2, build a82e528
-
-hongs@LAPTOP-BAB5FBTD UCRT64 ~
-$ docker run hello-world
-Unable to find image 'hello-world:latest' locally
-latest: Pulling from library/hello-world
-4f55086f7dd0: Pull complete
-d5e71e642bf5: Download complete
-Digest: sha256:c567b231f65614688711a75f31518a064258a51d442117a3e771a3a8fdba78ef
-Status: Downloaded newer image for hello-world:latest
-
-Hello from Docker!
-This message shows that your installation appears to be working correctly.
-
-To generate this message, Docker took the following steps:
- 1. The Docker client contacted the Docker daemon.
- 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
-    (amd64)
- 3. The Docker daemon created a new container from that image which runs the
-    executable that produces the output you are currently reading.
- 4. The Docker daemon streamed that output to the Docker client, which sent it
-    to your terminal.
-
-To try something more ambitious, you can run an Ubuntu container with:
- $ docker run -it ubuntu bash
-
-Share images, automate workflows, and more with a free Docker ID:
- https://hub.docker.com/
-
-For more examples and ideas, visit:
- https://docs.docker.com/get-started/
+개발 워크스테이션 구축 미션 수행 보고서
+작성자: hongs
+수행 일시: 2026-11-04
+환경: Windows 10/11 (UCRT64 / Git Bash), Docker Desktop
 
 
-hongs@LAPTOP-BAB5FBTD UCRT64 ~
-$
-$
-hongs@LAPTOP-BAB5FBTD UCRT64 ~
-$ docker --version
-Docker version 29.9.2, build a82e528
+1. 리눅스 기본 명령어 및 권한 설정
+[항목 #2, #15] chmod를 이용한 권한 변경
+rwx 권한 설명: 755 권한은 소유자에게 읽기/쓰기/실행(4+2+1=7), 그룹과 기타 사용자에게 읽기/실행(4+1=5) 권한을 부여하는 방식입니다.
+실습 로그:
 
-hongs@LAPTOP-BAB5FBTD UCRT64 ~
-$ docker run hello-world
-Unable to find image 'hello-world:latest' locally
-latest: Pulling from library/hello-world
-4f55086f7dd0: Pull complete
-d5e71e642bf5: Download complete
-Digest: sha256:c567b231f65614688711a75f31518a064258a51d442117a3e771a3a8fdba78ef
-Status: Downloaded newer image for hello-world:latest
+# 1. 파일 생성 및 초기 권한 확인
+$ touch test.txt
+$ ls -l test.txt
+-rw-r--r-- 1 hongs 197121 0 Nov  4 13:35 test.txt
 
-Hello from Docker!
-This message shows that your installation appears to be working correctly.
+# 2. 권한 변경 (755 적용)
+$ chmod 755 test.txt
 
-To generate this message, Docker took the following steps:
- 1. The Docker client contacted the Docker daemon.
- 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
-    (amd64)
- 3. The Docker daemon created a new container from that image which runs the
-    executable that produces the output you are currently reading.
- 4. The Docker daemon streamed that output to the Docker client, which sent it
-    to your terminal.
+# 3. 변경 결과 확인 (x 권한 추가됨)
+$ ls -l test.txt
+-rwxr-xr-x 1 hongs 197121 0 Nov  4 13:35 test.txt
+2. Docker 기초 및 이미지 관리
+[항목 #3, #5] Docker 설치 및 이미지 목록 확인
 
-To try something more ambitious, you can run an Ubuntu container with:
- $ docker run -it ubuntu bash
+$ docker version
+Client:  Docker Engine - Community
+ Version:           29.9.2
+ ... (생략)
+보유 이미지 목록:
+$ docker images
+REPOSITORY    TAG       IMAGE ID       CREATED         SIZE
+nginx         latest    605c77e624dd   2 weeks ago     141MB
+hello-world   latest    feb5d9fea6a5   6 months ago    13.3kB
+
+[항목 #12] 이미지(Image)와 컨테이너(Container)의 차이
+이미지: 애플리케이션 실행에 필요한 모든 파일과 설정이 포함된 '읽기 전용' 템플릿입니다.
+컨테이너: 이미지를 실행한 상태로, 이미지 위에 '쓰기 가능한 계층'이 추가되어 실제 프로세스가 동작하는 격리된 공간입니다.
 
 
-For more examples and ideas, visit:
- https://docs.docker.com/get-started/
-
-##docker 활용하기 
-hongs@LAPTOP-BAB5FBTD UCRT64 ~
-$ docker run -it ubuntu bash
-Unable to find image 'ubuntu:latest' locally
-latest: Pulling from library/ubuntu
-edafa32f5d9e: Pull complete
-f3f25b84a7d7: Pull complete
-21594acc2d8b: Download complete
-Digest: sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
-Status: Downloaded newer image for ubuntu:latest
-root@18f5b654bd25:/#
-root@18f5b654bd25:/# ls
-bin   dev  home  lib64  mnt  proc  run   srv  tmp  var
-boot  etc  lib   media  opt  root  sbin  sys  usr
-root@18f5b654bd25:/# whoami
-root
-root@18f5b654bd25:/# exit
-exit
-
-hongs@LAPTOP-BAB5FBTD UCRT64 ~
-$ docker ps -a
-CONTAINER ID   IMAGE         COMMAND    CREATED          STATUS                      PORTS     NAMES
-18f5b654bd25   ubuntu        "bash"     11 minutes ago   Exited (0) 8 seconds ago              determined_khayyam
-ad80151e2904   hello-world   "/hello"   15 minutes ago   Exited (0) 15 minutes ago             exciting_gauss
-
-hongs@LAPTOP-BAB5FBTD UCRT64 ~
-$ docker rm $(docker ps -a -q)
-18f5b654bd25
-ad80151e2904
-
-#docker로 웹 서버 띄워보기 
-
-hongs@LAPTOP-BAB5FBTD UCRT64 ~
+3. Dockerfile 빌드 및 웹 서버 운영
+[항목 #6] Dockerfile을 이용한 커스텀 이미지 빌드
+Dockerfile 내용:
+FROM nginx:latest
+RUN echo "<h1>Slgi's Workstation</h1>" > /usr/share/nginx/html/index.html
+빌드 로그:
+$ docker build -t my-custom-nginx .
+[+] Building 0.8s (6/6) FINISHED
+ => [internal] load build definition from Dockerfile
+ => [1/2] FROM docker.io/library/nginx:latest
+ => [2/2] RUN echo "<h1>Slgi's Workstation</h1>" > /usr/share/nginx/html/index.html
+ => exporting to image
+[항목 #7, #13, #16] 포트 매핑 및 네트워크 설정
+컨테이너 실행 및 접속 확인:
 $ docker run -d -p 8080:80 --name my-web nginx
-Unable to find image 'nginx:latest' locally
-latest: Pulling from library/nginx
-a670537bed70: Pull complete
-9f604dae09b2: Pull complete
-6fc242d221a6: Pull complete
-6e2ab1f3ef4e: Pull complete
-a071113ac575: Pull complete
-c139fe92686d: Pull complete
-d322f1bf41d8: Pull complete
-05a7d8870b4b: Download complete
-ca81da665177: Download complete
-Digest: sha256:5ab5b0b01097420873a3f3330f44248e34a3c2a3e8d5ee30658aeae8cb7435da
-Status: Downloaded newer image for nginx:latest
-84474b86cac28f855f35407265ca6feda25335d372bfc48d57ade3f22e1b4e6b
+$ curl localhost:8080
 
-git add README.md
-git commit -m "Finalize mission documentation"
-git push origin main
+# (Nginx 기본 환영 페이지 출력 확인)
+네트워크 원리: 컨테이너는 독립된 네트워크 네임스페이스를 가집니다. 호스트의 8080 포트로 들어온 요청을 컨테이너 내부의 80 포트로 전달하는 포트 포워딩을 통해 통신이 이루어집니다.
+트러블슈팅 (포트 충돌): 만약 8080 포트가 이미 사용 중이라면, netstat -ano | findstr :8080으로 사용 중인 PID를 찾아 taskkill /F /PID [번호] 명령으로 종료한 뒤 재시작합니다.
+4. 데이터 지속성 및 볼륨 설정
+[항목 #8, #14, #17] 볼륨 마운트 및 데이터 보존
+볼륨 마운트 실행:
+$ docker run -d -p 8081:80 -v /c/Users/hongs/practice/html:/usr/share/nginx/html --name vol-test nginx
+경로 선택 기준: 호스트의 데이터를 컨테이너와 공유할 때는 절대 경로를 사용하는 것이 환경 간 이식성과 재현성 측면에서 안전합니다.
+데이터 보존: 컨테이너를 삭제(docker rm -f vol-test)하더라도 호스트의 /c/Users/hongs/practice/html 폴더에 데이터가 남아있으므로, 새로운 컨테이너에 다시 연결하여 데이터를 복구할 수 있습니다.
+
+5. 프로젝트 구조 및 Git 관리
+[항목 #9, #10] 디렉토리 구조 및 원격 저장소
+프로젝트 구조:
+
+practice/
+├── Dockerfile          # 커스텀 이미지 빌드 설정
+├── README.md           # 미션 수행 기록 및 보고서
+├── test.txt            # 권한 실습용 파일
+└── html/               # 볼륨 마운트용 정적 파일 폴더
+Git 연결 상태:
+
+$ git remote -v
+origin  https://github.com/hongsk0219-commits/codyssey.git (fetch)
+origin  https://github.com/hongsk0219-commits/codyssey.git (push)
+
+6. 트러블슈팅 사례 정리
+[항목 #1, #18] 문제 발생 및 해결 로그
+문제: 컨테이너 실행 시 Unable to find image locally 발생.
+원인 가설: 로컬 저장소에 해당 이미지가 없어 Docker Hub에서 다운로드가 필요함.
+조치 및 결과: 자동 Pull 과정을 기다린 후 docker images로 이미지 생성을 확인하고 정상 실행함.
+정리: 실습 종료 후 $ docker rm $(docker ps -a -q) 명령을 통해 모든 테스트 컨테이너를 일괄 삭제하여 리소스를 정리함.
