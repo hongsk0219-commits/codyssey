@@ -9,7 +9,7 @@
 
 ## 1. git 설정 및 github연동 
 
-hongs@LAPTOP-BAB5FBTD UCRT64 ~
+''hongs@LAPTOP-BAB5FBTD UCRT64 ~
 $ git config --global user.name "홍슬기"
 git config --global user.email "hongsk0219@naver.com"
 git config --global init.defaultBranch main
@@ -29,14 +29,14 @@ credential.https://dev.azure.com.usehttppath=true
 init.defaultbranch=master
 user.name=홍슬기
 user.email=hongsk0219@naver.com
-init.defaultbranch=main
+init.defaultbranch=main''
 
 
 <img width="1497" height="537" alt="image" src="https://github.com/user-attachments/assets/d4398b5b-b1b3-4a2c-8b24-368d9bca0d0f" />
 
 
 ##권한관리 
-hongs@LAPTOP-BAB5FBTD UCRT64 ~
+''hongs@LAPTOP-BAB5FBTD UCRT64 ~
 $ pwd
 /c/Users/hongs
 
@@ -154,7 +154,32 @@ $ chmod 644 hello.txt #복구 후
 
 hongs@LAPTOP-BAB5FBTD UCRT64 ~
 $ ls -l hello.txt #권한 확인 
--rw-r--r-- 1 hongs 197609 0 Nov  5 16:01 hello.txt
+-rw-r--r-- 1 hongs 197609 0 Nov  5 16:01 hello.txt''
+
+''hongs@LAPTOP-BAB5FBTD UCRT64 ~
+$ mkdir -p ~/practice && cd ~/practice
+
+hongs@LAPTOP-BAB5FBTD UCRT64 ~/practice (main)
+$ echo "hello docker" > test.txt
+
+hongs@LAPTOP-BAB5FBTD UCRT64 ~/practice (main)
+$ cp test.txt copy.txt
+
+hongs@LAPTOP-BAB5FBTD UCRT64 ~/practice (main)
+$ my copy.txt renamed.txt
+bash: my: command not found
+
+hongs@LAPTOP-BAB5FBTD UCRT64 ~/practice (main)
+$ mv copy.txt renamed.txt
+
+hongs@LAPTOP-BAB5FBTD UCRT64 ~/practice (main)
+$ cat renamed.txt
+hello docker
+
+hongs@LAPTOP-BAB5FBTD UCRT64 ~/practice (main)
+$ rm renamed.txt
+
+''
 
 
 ---
